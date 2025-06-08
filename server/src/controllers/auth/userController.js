@@ -126,7 +126,6 @@ export const loginUser = asyncHandler(async (req, res) => {
     }
 });
 
-// logout user
 export const logoutUser = asyncHandler(async (req, res) => {
     res.clearCookie("token", {
         httpOnly: true,
@@ -136,4 +135,16 @@ export const logoutUser = asyncHandler(async (req, res) => {
     });
 
     res.status(200).json({ message: "User logged out" });
+});
+
+export const getUser = asyncHandler(async (req, res) => {
+  // get user details from the token ----> exclude password
+  const user = await User.findById(req.user._id).select("-password");
+
+  if (user) {
+    res.status(200).json(user);
+  } else {
+    // 404 Not Found
+    res.status(404).json({ message: "User not found" });
+  }
 });
