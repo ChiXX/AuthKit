@@ -6,8 +6,6 @@ import cookieParser from "cookie-parser";
 import fs from "node:fs";
 
 
-
-
 dotenv.config();
 
 const port = process.env.PORT || 8000;
