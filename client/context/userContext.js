@@ -14,7 +14,7 @@ export const UserContextProvider = ({ children }) => {
 
     const router = useRouter()
 
-    const [user, setUser] = useState(null)
+    const [user, setUser] = useState({})
     const [userState, setUserState] = useState({
         name: "",
         email: "",
@@ -86,6 +86,22 @@ export const UserContextProvider = ({ children }) => {
         }
     };
 
+    const logoutUser = async () => {
+        try {
+            const res = await axios.get(`${serverUrl}/api/v1/logout`, {
+                withCredentials: true, // send cookies to the server
+            });
+
+            toast.success("User logged out successfully");
+
+            // redirect to login page
+            router.push("/login");
+        } catch (error) {
+            console.log("Error logging out user", error);
+            toast.error(error.response.data.message);
+        }
+    };
+
     // get user details
     const getUser = async () => {
         setLoading(true);
@@ -127,6 +143,9 @@ export const UserContextProvider = ({ children }) => {
             console.log("Error getting user login status", error);
         }
 
+        console.log("user login status", loggedIn);
+
+
         return loggedIn;
     };
 
@@ -140,8 +159,12 @@ export const UserContextProvider = ({ children }) => {
         }));
     };
 
+    useEffect(() => {
+        userLoginStatus()
+    }, []);
+
     return (
-        <UserContext.Provider value={{ registerUser, userState, handlerUserInput, loginUser }}>
+        <UserContext.Provider value={{ registerUser, userState, handlerUserInput, loginUser, logoutUser }}>
             {children}
         </UserContext.Provider>
     );
