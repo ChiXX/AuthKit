@@ -37,8 +37,6 @@ export const UserContextProvider = ({ children }) => {
 
 
         try {
-            console.log("SERVER URL:", serverUrl);
-            console.log("Payload:", userState);
             const res = await axios.post(`${serverUrl}/api/v1/register`, userState);
             console.log("User registered successfully", res.data);
             toast.success("User registered successfully");
@@ -54,8 +52,82 @@ export const UserContextProvider = ({ children }) => {
             router.push("/login");
         } catch (error) {
             console.log("Error registering user", error);
-            toast.error(error.response.data);
+            toast.error(error.response.data.message);
         }
+    };
+    //coneowneovnowievoiw
+    //canwjnoni@gamil.com
+    const loginUser = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await axios.post(`${serverUrl}/api/v1/login`, {
+                email: userState.email,
+                password: userState.password,
+            },
+                {
+                    withCredentials: true, // send cookies to the server
+                });
+            toast.success("User logged successfully");
+
+            // clear the form
+            setUserState({
+                email: "",
+                password: "",
+            });
+
+            // refresh the user details
+            await getUser(); // fetch before redirecting
+
+            // push user to the
+            router.push("/");
+        } catch (error) {
+            console.log("Error logging in user", error);
+            toast.error(error.response.data.message);
+        }
+    };
+
+    // get user details
+    const getUser = async () => {
+        setLoading(true);
+        try {
+            const res = await axios.get(`${serverUrl}/api/v1/user`, {
+                withCredentials: true, // send cookies to the server
+            });
+
+            setUser((prevState) => {
+                return {
+                    ...prevState,
+                    ...res.data,
+                };
+            });
+
+            setLoading(false);
+        } catch (error) {
+            console.log("Error getting user details", error);
+            setLoading(false);
+            toast.error(error.response.data.message);
+        }
+    };
+
+    const userLoginStatus = async () => {
+        let loggedIn = false;
+        try {
+            const res = await axios.get(`${serverUrl}/api/v1/login-status`, {
+                withCredentials: true, // send cookies to the server
+            });
+
+            // coerce the string to boolean
+            loggedIn = !!res.data;
+            setLoading(false);
+
+            if (!loggedIn) {
+                router.push("/login");
+            }
+        } catch (error) {
+            console.log("Error getting user login status", error);
+        }
+
+        return loggedIn;
     };
 
     // dynamic form handler
@@ -69,7 +141,7 @@ export const UserContextProvider = ({ children }) => {
     };
 
     return (
-        <UserContext.Provider value={{ registerUser, userState, handlerUserInput }}>
+        <UserContext.Provider value={{ registerUser, userState, handlerUserInput, loginUser }}>
             {children}
         </UserContext.Provider>
     );
