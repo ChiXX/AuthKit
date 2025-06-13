@@ -195,6 +195,54 @@ export const UserContextProvider = ({ children }) => {
         }
     };
 
+    const forgotPasswordEmail = async (email) => {
+        setLoading(true);
+
+        try {
+            const res = await axios.post(
+                `${serverUrl}/api/v1/forgot-password`,
+                {
+                    email,
+                },
+                {
+                    withCredentials: true, // send cookies to the server
+                }
+            );
+
+            toast.success("Forgot password email sent successfully");
+            setLoading(false);
+        } catch (error) {
+            console.log("Error sending forgot password email", error);
+            toast.error(error.response.data.message);
+            setLoading(false);
+        }
+    };
+
+    const resetPassword = async (token, password) => {
+        setLoading(true);
+
+        try {
+            const res = await axios.post(
+                `${serverUrl}/api/v1/reset-password/${token}`,
+                {
+                    password,
+                },
+                {
+                    withCredentials: true, // send cookies to the server
+                }
+            );
+
+            toast.success("Password reset successfully");
+            setLoading(false);
+            // redirect to login page
+            router.push("/login");
+        } catch (error) {
+            console.log("Error resetting password", error);
+            toast.error(error.response.data.message);
+            setLoading(false);
+        }
+    };
+
     const userLoginStatus = async () => {
         let loggedIn = false;
         try {
@@ -242,7 +290,7 @@ export const UserContextProvider = ({ children }) => {
     }, []);
 
     return (
-        <UserContext.Provider value={{ registerUser, userState, handlerUserInput, loginUser, logoutUser, userLoginStatus, user, updateUser, emailVerification, verifyUser }}>
+        <UserContext.Provider value={{ registerUser, userState, handlerUserInput, loginUser, logoutUser, userLoginStatus, user, updateUser, emailVerification, verifyUser, forgotPasswordEmail, resetPassword }}>
             {children}
         </UserContext.Provider>
     );
