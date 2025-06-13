@@ -152,6 +152,49 @@ export const UserContextProvider = ({ children }) => {
         }
     };
 
+    const emailVerification = async () => {
+        setLoading(true);
+
+        try {
+            const post = await axios.post(`${serverUrl}/api/v1/verify-email`, {}, {
+                withCredentials: true, // send cookies to the server
+            });
+
+            toast.success("Email verification sent successfully");
+            setLoading(false);
+        } catch (error) {
+            console.log("Error updating user details", error);
+            setLoading(false);
+            toast.error(error.response.data.message);
+        }
+    }
+
+    const verifyUser = async (token) => {
+        setLoading(true);
+        try {
+            const res = await axios.post(
+                `${serverUrl}/api/v1/verify-user/${token}`,
+                {},
+                {
+                    withCredentials: true, // send cookies to the server
+                }
+            );
+
+            toast.success("User verified successfully");
+
+            // refresh the user details
+            getUser();
+
+            setLoading(false);
+            // redirect to home page
+            router.push("/");
+        } catch (error) {
+            console.log("Error verifying user", error);
+            toast.error(error.response.data.message);
+            setLoading(false);
+        }
+    };
+
     const userLoginStatus = async () => {
         let loggedIn = false;
         try {
@@ -199,7 +242,7 @@ export const UserContextProvider = ({ children }) => {
     }, []);
 
     return (
-        <UserContext.Provider value={{ registerUser, userState, handlerUserInput, loginUser, logoutUser, userLoginStatus, user, updateUser }}>
+        <UserContext.Provider value={{ registerUser, userState, handlerUserInput, loginUser, logoutUser, userLoginStatus, user, updateUser, emailVerification, verifyUser }}>
             {children}
         </UserContext.Provider>
     );
