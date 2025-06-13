@@ -243,6 +243,28 @@ export const UserContextProvider = ({ children }) => {
         }
     };
 
+    // change password
+    const changePassword = async (currentPassword, newPassword) => {
+        setLoading(true);
+
+        try {
+            const res = await axios.patch(
+                `${serverUrl}/api/v1/change-password`,
+                { currentPassword, newPassword },
+                {
+                    withCredentials: true, // send cookies to the server
+                }
+            );
+
+            toast.success("Password changed successfully");
+            setLoading(false);
+        } catch (error) {
+            console.log("Error changing password", error);
+            toast.error(error.response.data.message);
+            setLoading(false);
+        }
+    };
+
     const userLoginStatus = async () => {
         let loggedIn = false;
         try {
@@ -290,7 +312,21 @@ export const UserContextProvider = ({ children }) => {
     }, []);
 
     return (
-        <UserContext.Provider value={{ registerUser, userState, handlerUserInput, loginUser, logoutUser, userLoginStatus, user, updateUser, emailVerification, verifyUser, forgotPasswordEmail, resetPassword }}>
+        <UserContext.Provider value={{
+            registerUser,
+            userState,
+            handlerUserInput,
+            loginUser,
+            logoutUser,
+            userLoginStatus,
+            user,
+            updateUser,
+            emailVerification,
+            verifyUser,
+            forgotPasswordEmail,
+            resetPassword,
+            changePassword
+        }}>
             {children}
         </UserContext.Provider>
     );
