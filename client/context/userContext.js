@@ -125,6 +125,33 @@ export const UserContextProvider = ({ children }) => {
         }
     };
 
+    const updateUser = async (e, data) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const res = await axios.patch(`${serverUrl}/api/v1/user`, data, {
+                withCredentials: true, // send cookies to the server
+            });
+
+            // update the user state
+            setUser((prevState) => {
+                return {
+                    ...prevState,
+                    ...res.data,
+                };
+            });
+
+            toast.success("User updated successfully");
+
+            setLoading(false);
+        } catch (error) {
+            console.log("Error updating user details", error);
+            setLoading(false);
+            toast.error(error.response.data.message);
+        }
+    };
+
     const userLoginStatus = async () => {
         let loggedIn = false;
         try {
@@ -160,11 +187,19 @@ export const UserContextProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        userLoginStatus()
+        const loginStatusGetUser = async () => {
+            const isLoggedIn = await userLoginStatus();
+
+            if (isLoggedIn) {
+                await getUser();
+            }
+        };
+
+        loginStatusGetUser();
     }, []);
 
     return (
-        <UserContext.Provider value={{ registerUser, userState, handlerUserInput, loginUser, logoutUser }}>
+        <UserContext.Provider value={{ registerUser, userState, handlerUserInput, loginUser, logoutUser, userLoginStatus, user, updateUser }}>
             {children}
         </UserContext.Provider>
     );
