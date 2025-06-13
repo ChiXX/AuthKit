@@ -14,8 +14,12 @@ export default function Home() {
 		userState,
 		updateUser,
 		emailVerification,
+		allUsers,
+		deleteUser,
 	} = useUserContext();
 	const { name, photo, isVerified, bio } = user;
+	console.log(user);
+	
 
 	// state
 	const [isOpen, setIsOpen] = useState(false);
@@ -92,6 +96,37 @@ export default function Home() {
 			<div className="mt-4 flex gap-8">
 				<div className="flex-1">
 					<ChangePasswordForm />
+				</div>
+				<div className="flex-1">
+					{user.role === "admin" && (
+						<ul>
+							{allUsers.map(
+								(user: any, i: number) =>
+									user.role !== "admin" && (
+										<li
+											key={i}
+											className="mb-2 px-2 py-3 border grid grid-cols-4 items-center gap-8 rounded-md"
+										>
+											<img
+												src={user.photo}
+												alt={user.name}
+												className="w-[40px]  h-[40px] rounded-full"
+											/>
+											<p>{user.name}</p>
+											<p>{user.bio}</p>
+											<button
+												className="bg-red-500 text-white p-2 rounded-md"
+												onClick={() => {
+													deleteUser(user._id);
+												}}
+											>
+												Delete User
+											</button>
+										</li>
+									)
+							)}
+						</ul>
+					)}
 				</div>
 			</div>
 		</main>
